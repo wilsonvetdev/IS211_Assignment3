@@ -1,12 +1,11 @@
 import argparse
 import urllib.request
-import logging
 import ssl
 import csv, re
 import sys
 import pprint
 
-#  url = http://s3.amazonaws.com/cuny-is211-spring2015/weblog.csv
+url = 'http://s3.amazonaws.com/cuny-is211-spring2015/weblog.csv'
 
 def download_data(url):
     req = urllib.request.Request(url)
@@ -24,12 +23,24 @@ def download_data(url):
                 writer.writerow(re.split('\n', line))
 
 
-data = download_data('http://s3.amazonaws.com/cuny-is211-spring2015/weblog.csv')
+def process_data(url):
 
-with open('img_data.csv', newline='') as img_file:
-    data_reader = csv.reader(img_file, delimiter="'")
-    for line in data_reader:
-        print(line)
+    download_data(url)
+
+    data_list = []
+
+    with open('img_data.csv', newline='') as img_file:
+        data_reader = csv.reader(img_file, delimiter= ",")
+        for line in data_reader:
+            if len(line) == 1:
+                changed_line = re.split(r',\s*(?![^()]*\))', line[0])
+                data_list.append(changed_line)
+            else:
+                data_list.append(line)
+
+    pprint.pprint(len(data_list))
+    
+process_data(url)
 
 # def main(url):
 #     print(f"Running main with URL = {url}...")
